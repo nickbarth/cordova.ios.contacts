@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" id="cordova.ios.contacts" version="1.0.0">
+  <engines>
+    <engine name="cordova" version=">=3.0.0" />
+  </engines>
+  <name>iOSContacts</name>
+  <description>Plugin for iOS to retrieve the Contacts.</description>
+  <author>Nick Barth</author>
+  <keywords>iOS Contacts</keywords>
+  <license>MIT</license>
+
+  <!-- JavaScript interface -->
+  <js-module src="www/iOSContacts.js" name="iOSContacts" target="www/iOSContacts.js">
+    <clobbers target="window.iOSContacts" />
+  </js-module>
+
+  <!-- ios -->
+  <platform name="ios">
+    <config-file target="config.xml" parent="plugins">
+      <feature name="iOSContacts">
+        <param name="ios-package" value="iOSContacts"/>
+        <param name="onload" value="true" />
+      </feature>
+      <plugin name="iOSContacts" value="iOSContacts"/>
+    </config-file>
+    <header-file src="src/ios/iOSContacts.h" />
+    <source-file src="src/ios/iOSContacts.m" />
+  </platform>
+</plugin>
