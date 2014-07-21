@@ -4,14 +4,14 @@
 
 @synthesize callbackId;
 
-- (void)iOSParseLogin:(CDVInvokedUrlCommand *)command {
+- (void)iOSContacts:(CDVInvokedUrlCommand *)command {
     self.callbackId = command.callbackId;
 
-    NSString *result = @"";
 
     CFErrorRef * error = NULL;
     ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, error);
     ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
+       
       if (granted) {
           dispatch_async(dispatch_get_main_queue(), ^{
               CFArrayRef allContacts = ABAddressBookCopyArrayOfAllPeople(addressBook);
@@ -19,7 +19,7 @@
               // NSString *contacts = @"";
 
               if (numOfContacts > 0) {
-                  result = @"{ \"error\": false, \"contacts\": [";
+                  NSString *result = [NSString stringWithFormat: @"{ \"error\": false, \"contacts\": ["];
 
                   for(int i = 0; i < numOfContacts; i++){
                       ABRecordRef person = CFArrayGetValueAtIndex(allContacts, i);
@@ -39,23 +39,23 @@
                       // NSMutableDictionary *contact = [NSMutableDictionary dictionary];
                       // [contact setObject:name forKey:@"name"];
                       // [contact setObject:numbers forKey:@"numbers"];
-                      result = [NSString stringWithFormat:@"%@ { \"name\": \"%@ %@\", \"number\": \"%@\" },", contacts, firstName, lastName, phoneNumber];
+                      result = [NSString stringWithFormat:@"%@ { \"name\": \"%@ %@\", \"number\": \"%@\" },", result, firstName, lastName, phoneNumber];
                   }
 
-                  result = [NSString stringWithFormat:@"%@] }", [result substringToIndex:[result length] - 1]];
+                  result = [NSString stringWithFormat:@"%@] }", result];
                   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
                   NSString* javaScript = [pluginResult toSuccessCallbackString:self.callbackId];
                   [self writeJavascript:javaScript];
 
               } else {
-                result = @"{ \"error\": false, \"contacts\": [] }";
+                NSString *result = @"{ \"error\": false, \"contacts\": [] }";
                 CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
                 NSString* javaScript = [pluginResult toSuccessCallbackString:self.callbackId];
                 [self writeJavascript:javaScript];
               }
           });
       } else {
-        result = @"{ \"error\": \"Request for Address Book Contacts declined.\" }";
+        NSString *result = @"{ \"error\": \"Request for Address Book Contacts declined.\" }";
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
         NSString* javaScript = [pluginResult toSuccessCallbackString:self.callbackId];
         [self writeJavascript:javaScript];
