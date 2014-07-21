@@ -1,6 +1,5 @@
 #import "iOSContacts.h"
 
-
 @implementation iOSContacts
 
 @synthesize callbackId;
