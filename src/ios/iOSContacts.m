@@ -42,7 +42,7 @@
                       result = [NSString stringWithFormat:@"%@ { \"name\": \"%@ %@\", \"number\": \"%@\" },", contacts, firstName, lastName, phoneNumber];
                   }
 
-                  result = [NSString stringWithFormat:@"%@] }", contacts];
+                  result = [NSString stringWithFormat:@"%@] }", [result substringToIndex:[result length] - 1]];
                   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
                   NSString* javaScript = [pluginResult toSuccessCallbackString:self.callbackId];
                   [self writeJavascript:javaScript];
