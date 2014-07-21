@@ -25,5 +25,7 @@
     </config-file>
     <header-file src="src/ios/iOSContacts.h" />
     <source-file src="src/ios/iOSContacts.m" />
+
+    <framework src="AddressBook.framework" />
   </platform>
 </plugin>

@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
+#import <AddressBook/AddressBook.h>
 #import <Cordova/CDV.h>
 
 @interface iOSContacts: CDVPlugin{
