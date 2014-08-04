@@ -11,7 +11,7 @@
     ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, error);
     ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
       if (granted) {
-          dispatch_async(dispatch_get_main_queue(), ^{
+          [[NSOperationQueue mainQueue] addOperationWithBlock:^{
               NSArray *allContacts = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(addressBook);
 
               if ([allContacts count] > 0) {
@@ -44,20 +44,20 @@
                   
                   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
                   NSString* javaScript = [pluginResult toSuccessCallbackString:self.callbackId];
-                  [self writeJavascript:javaScript];
+                  [self performSelectorOnMainThread:@selector(writeJavascript:) withObject:javaScript waitUntilDone:NO];
 
               } else {
                 NSString *result = @"{ \"error\": false, \"contacts\": [] }";
                 CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
                 NSString* javaScript = [pluginResult toSuccessCallbackString:self.callbackId];
-                [self writeJavascript:javaScript];
+                [self performSelectorOnMainThread:@selector(writeJavascript:) withObject:javaScript waitUntilDone:NO];
               }
-          });
+          }];
       } else {
         NSString *result = @"{ \"error\": \"Request for Address Book Contacts declined.\" }";
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
         NSString* javaScript = [pluginResult toSuccessCallbackString:self.callbackId];
-        [self writeJavascript:javaScript];
+        [self performSelectorOnMainThread:@selector(writeJavascript:) withObject:javaScript waitUntilDone:NO];
       }
     });
 }
