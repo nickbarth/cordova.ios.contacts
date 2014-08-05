@@ -7,12 +7,12 @@
 - (void)iOSContacts:(CDVInvokedUrlCommand *)command {
     self.callbackId = command.callbackId;
     
-    CFErrorRef * error = NULL;
+    CFErrorRef *error = NULL;
     ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, error);
     ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
-        if (granted) {
+        if (granted && addressBook) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                CFArrayRef *allContacts = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeopleInSourceWithSortOrdering(addressBook, nil, kABPersonSortByLastName);
+                CFArrayRef allContacts = ABAddressBookCopyArrayOfAllPeople(addressBook);
                 CFIndex totalPeople = ABAddressBookGetPersonCount(addressBook);
                 
                 BOOL hasContacts = NO;
@@ -21,8 +21,8 @@
                     NSString *result = [NSString stringWithFormat: @"{ \"error\": false, \"contacts\": ["];
                     
                     for(CFIndex i = 0; i < totalPeople; i++){
-                        ABRecordRef person = [CFArrayGetValueAtIndex objectAtIndex:i];
-                        
+                        ABRecordRef person = CFArrayGetValueAtIndex(allContacts, i);
+                    
                         NSString *firstName = @"";
                         NSString *lastName = @"";
                         NSString *phoneNumber = @"";
@@ -51,12 +51,12 @@
                                     
                                     if (cfPhoneLabel) {
                                         phoneLabel = (NSString *)CFBridgingRelease(cfPhoneLabel);
-                                        cfPhoneNumber phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbers, n);
+                                        CFTypeRef cfPhoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbers, n);
                                         
-                                        if (phoneNumber) {
+                                        if (cfPhoneNumber) {
                                             if ([phoneLabel isEqualToString:(NSString *)kABPersonPhoneMobileLabel]) {
                                                 hasContacts = YES;
-                                                phoneNumber = (NSString *) CFBridgingRelease(phoneNumbers, n);
+                                                phoneNumber = (NSString *) CFBridgingRelease(cfPhoneNumber);
                                                 break;
                                             }
                                         }
@@ -87,6 +87,9 @@
                     NSString* javaScript = [pluginResult toSuccessCallbackString:self.callbackId];
                     [self performSelectorOnMainThread:@selector(writeJavascript:) withObject:javaScript waitUntilDone:NO];
                 }
+                
+                CFRelease(allContacts);
+                CFRelease(addressBook);
             }];
         } else {
             NSString *result = @"{ \"error\": \"Request for Address Book Contacts declined.\" }";
@@ -95,8 +98,6 @@
             [self performSelectorOnMainThread:@selector(writeJavascript:) withObject:javaScript waitUntilDone:NO];
         }
     });
-    CFRelease(addressBook);
 }
 
 @end
-
