@@ -20,9 +20,9 @@
                 if (totalPeople > 0) {
                     NSString *result = [NSString stringWithFormat: @"{ \"error\": false, \"contacts\": ["];
                     
-                    for(CFIndex i = 0; i < totalPeople; i++){
+                    for(ABRecordID i = 0; i < totalPeople; i++){
                         ABRecordRef person = CFArrayGetValueAtIndex(allContacts, i);
-                    
+                        
                         NSString *firstName = @"";
                         NSString *lastName = @"";
                         NSString *phoneNumber = @"";
@@ -66,16 +66,19 @@
                                 CFRelease(phoneNumbers);
                             }
                             
-                            if (![phoneNumber isEqualToString:@""]) {
+                            NSString *fullname = [NSString stringWithFormat:@"%@ %@", firstName, lastName];
+                            if (![phoneNumber isEqualToString:@""] && ![fullname isEqualToString:@" "]) {
                                 result = [NSString stringWithFormat:@"%@ { \"name\": \"%@ %@\", \"number\": \"%@\" },", result, firstName, lastName, phoneNumber];
                             }
                         }
+                        
+                        CFRelease(person);
                     }
                     
                     if (hasContacts) {
                         result = [NSString stringWithFormat:@"%@] }", [result substringToIndex:[result length] - 1]];
                     } else {
-                        result = [NSString stringWithFormat:@"%@] }", result];
+                        result = @"{ \"error\": false, \"contacts\": [] }";
                     }
                     
                     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
@@ -89,7 +92,6 @@
                 }
                 
                 CFRelease(allContacts);
-                CFRelease(addressBook);
             }];
         } else {
             NSString *result = @"{ \"error\": \"Request for Address Book Contacts declined.\" }";
