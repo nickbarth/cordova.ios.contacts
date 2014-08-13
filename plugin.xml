@@ -7,7 +7,7 @@
   <description>Plugin for iOS to retrieve the Contacts.</description>
   <author>Nick Barth</author>
   <keywords>iOS Contacts</keywords>
-  <license>MIT</license>
+  <license>CC0</license>
 
   <!-- JavaScript interface -->
   <js-module src="www/iOSContacts.js" name="iOSContacts" target="www/iOSContacts.js">
